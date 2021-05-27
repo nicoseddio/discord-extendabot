@@ -13,16 +13,49 @@ const cache = {};
 client.login(auth.token);
 client.on('ready', () => {
     console.log(`\nLogged in as ${client.user.tag}!`);
+
     cache.apps = loadApps(config.apps,buildKernel());
     console.log(`Loaded ${Object.keys(cache.apps).length} apps.`)
+
     selftest();
 });
+
+// Listeners
+client.on('message', async function(message) {
+    if (message.author.id === client.user.id) return; //ignore self
+    //kernel.distribute(message, 'message');
+});
+client.on('messageDelete', async function(message) {
+    //kernel.distribute(message, 'messageDelete');
+});
+client.on('guildCreate', async function(guild) {
+    //on first guild join
+    if (config.guild === "") {
+        //establish linked guild
+        config.guild = guild.id;
+
+        //establish primary bot owner
+        let ownerTag = undefined;
+        client.users.fetch(guild.ownerID)
+                    .then(user => config.sudoers.push(user.id))
+    }
+    //if different guild, leave.
+    else {
+        guild.leave().catch(err => {
+            console.log(`there was an error leaving the guild: \n ${err.message}`);
+            }
+        );
+    }
+})
 
 // Functions
 function selftest() {
     dumpSession(config,cache);
     return;
 }
+
+
+
 function loadApps(appsConfig,kernel,dir='./lib/apps/') {
     let cfg = appsConfig;
     const aCache = {};

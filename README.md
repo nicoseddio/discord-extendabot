@@ -1,8 +1,12 @@
 # discord-extendabot
-A full redesign of what was the meow-bot for "The Jasmine Dragon" Discord server, the Extendabot is a simple Discord bot providing an interface for custom "apps": this bot can do anything!
+The extendabot is a simple, single-guild Discord bot built on Node.js, providing an interface for custom "apps": small purpose-driven javascript files that do the heavy lifting of message handling.  
+
+The extendabot's design makes it easy to add, edit, and remove features by simply editing the containerized application files, while the basic bot functions take care of app management and passing on messages and events.  
+
+This bot can do anything!
 
 ## setup
-meow-bot requires the following dependencies:  
+The extendabot requires the following dependencies:  
 - `discord.js`
 
 Clone the repo and install dependencies with the following commands:  
@@ -18,4 +22,5 @@ node index.js
 ```
 
 ## resources
-[Discord Developer Portal](https://discord.com/developers/applications)
+- [Discord Developer Portal](https://discord.com/developers/applications)  
+- [Discord.js Documentation](https://discord.js.org/#/docs/main/stable/general/welcome)
