@@ -1,0 +1,7 @@
+**/auth.json
+**/.DS_Store
+**/logfile.txt
+**/node_modules
+**/dump**
+**/backup_**
+**/*.log
