@@ -12,12 +12,13 @@ const cache = {};
 // Startup
 client.login(auth.token);
 client.on('ready', () => {
-    log(`Logged in as ${client.user.tag}!`);
+    log(`Logged in as ${client.user.tag}!`,'\n');
 
     cache.apps = loadApps(config.apps,buildKernel());
     log(`Loaded ${Object.keys(cache.apps).length} apps.`);
 
     checkDirectory(config.local_files);
+    saveConfig(config,'config.json')
 
     selftest();
 });
@@ -80,13 +81,13 @@ function buildKernel() {
 }
 
 function dumpSession(config,cache) {
-    objectToJSON(config,'dump_configBackup')
-    objectToJSON(cache, 'dump_cacheBackup')
+    objectToJSON(config,'dump_configBackup.json')
+    objectToJSON(cache, 'dump_cacheBackup.json')
 }
 
-function objectToJSON(object = this.cache,filename = 'dump_file') {
+function objectToJSON(object = {},filename = 'dump_file.json') {
     let data = JSON.stringify(replaceCircular(object), null, '    ');
-    fs.writeFile(filename+'.json', data, function (err) {
+    fs.writeFile(filename, data, function (err) {
         if (err) {
             console.log(`filesave error: ${err.message}`);
             return;
@@ -129,6 +130,19 @@ var replaceCircular = function(val, cache) {
     return val;
 };
 
+function saveConfig(config,filename,make_backup=true) {
+    log("Saving config file...")
+    if (make_backup) {
+        try {
+            let contents = fs.readFileSync(filename)
+            fs.writeFileSync(filename+'.backup',contents)
+        } catch(e) {
+            log(`ERROR backing up config file:\n${e}`)
+        }
+    }
+    objectToJSON(config,filename)
+    log(`Config saved to ${filename}.`)
+}
 function log(str='Marker message.',new_line='',log_to_file=true) {
     let logmessage = `${new_line}${createTimeStamp()} ${str}`;
     console.log(logmessage);
