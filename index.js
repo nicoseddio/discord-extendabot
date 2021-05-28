@@ -12,10 +12,12 @@ const cache = {};
 // Startup
 client.login(auth.token);
 client.on('ready', () => {
-    console.log(`\nLogged in as ${client.user.tag}!`);
+    log(`Logged in as ${client.user.tag}!`);
 
     cache.apps = loadApps(config.apps,buildKernel());
-    console.log(`Loaded ${Object.keys(cache.apps).length} apps.`)
+    log(`Loaded ${Object.keys(cache.apps).length} apps.`);
+
+    checkDirectory(config.local_files);
 
     selftest();
 });
@@ -53,8 +55,6 @@ function selftest() {
     dumpSession(config,cache);
     return;
 }
-
-
 
 function loadApps(appsConfig,kernel,dir='./lib/apps/') {
     let cfg = appsConfig;
@@ -128,3 +128,22 @@ var replaceCircular = function(val, cache) {
     }
     return val;
 };
+
+function log(str='Marker message.',new_line='',log_to_file=true) {
+    let logmessage = `${new_line}${createTimeStamp()} ${str}`;
+    console.log(logmessage);
+    if(log_to_file) logToFile(logmessage);
+}
+function logToFile(str='Marker message.', file='./console.log') {
+    fs.appendFile(file, `\n`+str, err => {
+        if (err) { console.error(err); return; }
+    })
+}
+
+function checkDirectory(dir) {
+    try { if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+    } catch(error) {
+        log(`ERROR reading or creating local files:\n`+
+            `Directory: ${dir}\n${error}`);
+    }
+}

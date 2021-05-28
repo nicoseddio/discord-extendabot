@@ -8,6 +8,7 @@
         "commands": ""
     },
     "apps": {},
+    "local_files": "./local/",
     "reply_to_mentions": true,
     "mention_commands": false
 }

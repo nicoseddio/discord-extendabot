@@ -5,3 +5,4 @@
 **/dump**
 **/backup_**
 **/*.log
+local/
