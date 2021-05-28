@@ -11,6 +11,12 @@ For the sake of simplicity, the Extendabot *does not check* for duplicate comman
 The extendabot requires the following dependencies:  
 - `discord.js`
 
+Additionally, the following supplied apps have their own dependencies:
+- `MusicStreamer.js`
+    - `ffmpeg-static`
+    - `@discordjs/opus`
+    - `ytdl-core`
+
 Clone the repo and install dependencies with the following commands:  
 ```
 npm install discord.js ffmpeg fluent-ffmpeg @discordjs/opus ytdl-core --save
