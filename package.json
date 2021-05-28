@@ -1,0 +1,25 @@
+{
+  "name": "discord-extendabot",
+  "version": "1.0.0",
+  "description": "The Extendabot is a simple Discord bot providing an interface for custom \"apps\": this bot can do anything!",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicoseddio/discord-extendabot.git"
+  },
+  "author": "nicoseddio",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicoseddio/discord-extendabot/issues"
+  },
+  "homepage": "https://github.com/nicoseddio/discord-extendabot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3"
+  }
+}
