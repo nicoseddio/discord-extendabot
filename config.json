@@ -1,5 +1,7 @@
 {
-    "guild": "",
+    "guild": {
+        "id": "791397233743626251"
+    },
     "sudoers": [
         "446468247756341250"
     ],
@@ -8,6 +10,12 @@
         "commands": ""
     },
     "apps": {
+        "CatDelivery.js": {
+            "settings": {}
+        },
+        "Quantum.js": {
+            "settings": {}
+        }
     },
     "local_files": "./local/",
     "reply_to_mentions": true,

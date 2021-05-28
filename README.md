@@ -3,7 +3,9 @@ The extendabot is a simple, single-guild Discord bot built on Node.js, providing
 
 The extendabot's design makes it easy to add, edit, and remove features by simply editing the containerized application files, while the basic bot functions take care of app management and passing on messages and events.  
 
-This bot can do anything!
+This bot can do anything!  
+
+For the sake of simplicity, the Extendabot *does not check* for duplicate commands: this is left to the bot administrator. Bot administrators should ensure that the apps they include all use unique commands, ideally listed in each app's `commands()` method. Duplicate commands will result in multiple apps receiving the command simultaneously.  
 
 ## setup
 The extendabot requires the following dependencies:  
