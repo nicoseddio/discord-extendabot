@@ -136,8 +136,11 @@ function compileCommandsMessages(appCache) {
             title = `\n\n*from ${a.replace('.js','')}:*`;
         //for each command description
         Object.keys(app.commands).forEach(ci => {
-            let cstr = `\n• **\`${app.commands[ci].usage}\`**: `+
-                `${app.commands[ci].description}`
+            let cstr = `\n• **\`${app.commands[ci].command}`
+            if (typeof(app.commands[ci].usage) === 'string')
+                if(app.commands[ci].usage.length > 0)
+                    cstr+=` ${app.commands[ci].usage}`
+            cstr+=`\`**: ${app.commands[ci].description}`
             //add to approriate admin/user message
             if (app.commands[ci].admin) cs_adm += cstr;
             else cs += cstr;
