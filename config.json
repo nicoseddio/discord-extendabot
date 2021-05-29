@@ -5,19 +5,8 @@
     "sudoers": [
         "446468247756341250"
     ],
-    "messages": {
-        "commands_sudo": "",
-        "commands": ""
-    },
     "apps": {
-        "CatDelivery.js": {
-            "settings": {}
-        },
-        "Quantum.js": {
-            "settings": {}
-        }
     },
     "local_files": "./local/",
-    "reply_to_mentions": true,
     "mention_commands": false
 }
