@@ -110,6 +110,9 @@ function loadApps(appsConfig,kernel,dir='./lib/apps/') {
 
 function buildKernel() {
     class kernel {
+        getClientID() {
+            return client.user.id;
+        }
         log(message) { //kernel call for apps
             log(message); //function call
         }
