@@ -65,11 +65,15 @@ client.on('message', async function(message) {
 
     if (args.length > 0)
         switch (args[0]) {
-            case 'commands':
+            case '!help':
+            case '!commands':
                 message.reply(msg_avail_commands);
+                if (config.sudoers.includes(message.author.id))
+                    message.channel.send(`View admin commands with \`!admin-commands\`.`)
                 break;
-            case 'admin-commands':
-                message.reply(msg_avail_admin_commands);
+            case '!admin-commands':
+                if (config.sudoers.includes(message.author.id))
+                    message.reply(msg_avail_admin_commands);
                 break;
             default:
                 distribute(message,'message',cache.apps);
@@ -108,20 +112,23 @@ client.on('messageDelete', async function(message) {
 // ---------------- Functions ---------------- //
 // ------------------------------------------- //
 function compileCommandsMessages(appCache) {
-    let commandsList = 'available commands:';
-    let adminCommandsList = 'available administrative commands:';
+    let commandsList = 'active commands:';
+    let adminCommandsList = 'active administrative commands:';
+    //for each app's commands
     for (a in appCache) {
-        let app = appCache[a];
+        let app = appCache[a], cs = '', cs_adm = '',
+            title = `\n\n*from ${a.replace('.js','')}:*`;
+        //for each command description
         Object.keys(app.commands).forEach(ci => {
-            let cstr = 
-                `\n• **\`${app.commands[ci].usage}\`**` +
-                `\n   ${app.commands[ci].description}`  +
-                `\n       *from ${a.replace('.js','')}*`
-            if (!app.commands[ci].admin)
-                commandsList += cstr;
-            else
-                adminCommandsList += cstr;
+            let cstr = `\n• **\`${app.commands[ci].usage}\`**: `+
+                `${app.commands[ci].description}`
+            //add to approriate admin/user message
+            if (app.commands[ci].admin) cs_adm += cstr;
+            else cs += cstr;
         })
+        //if applicable, add to appropriate list
+        if (cs.length > 0) commandsList += title+cs;
+        if (cs_adm.length > 0) adminCommandsList += title+cs_adm;
     }
     return [commandsList, adminCommandsList];
 }
