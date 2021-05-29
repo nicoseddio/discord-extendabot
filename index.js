@@ -90,7 +90,7 @@ client.on('messageDelete', async function(message) {
     try {
         distribute(message,'messageDelete',cache.apps);
     } catch (error) {
-        log(`ERROR encountered, skipping message:\n` +
+        log(`ERROR encountered, skipping message delete:\n` +
             `From ${message.author.tag}: ${message.content}\n` +
             error);
     }
