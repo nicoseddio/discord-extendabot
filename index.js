@@ -53,35 +53,47 @@ client.on('ready', () => {
 // ---------------- Listeners ---------------- //
 // ------------------------------------------- //
 client.on('message', async function(message) {
-    //ensure message originates from bound guild
-    try { if (message.guild.id != config.guild.id) return; }
-    catch (error) { log("Invalid guild."); return; }
+    try {
+        //ensure message originates from bound guild
+        try { if (message.guild.id != config.guild.id) return; }
+        catch (error) { log("Invalid guild."); return; }
 
-    //ignore self
-    if (message.author.id === client.user.id) return;
+        //ignore self
+        if (message.author.id === client.user.id) return;
 
-    //parse commands for system
-    let args = message.content.split(' ');
+        //parse commands for system
+        let args = message.content.split(' ');
 
-    if (args.length > 0)
-        switch (args[0]) {
-            case '!help':
-            case '!commands':
-                message.reply(msg_avail_commands);
-                if (config.sudoers.includes(message.author.id))
-                    message.channel.send(`View admin commands with \`!admin-commands\`.`)
-                break;
-            case '!admin-commands':
-                if (config.sudoers.includes(message.author.id))
-                    message.reply(msg_avail_admin_commands);
-                break;
-            default:
-                distribute(message,'message',cache.apps);
-                break;
-        }
+        if (args.length > 0)
+            switch (args[0]) {
+                case '!help':
+                case '!commands':
+                    message.reply(msg_avail_commands);
+                    if (config.sudoers.includes(message.author.id))
+                        message.channel.send(`View admin commands with \`!sudo-commands\`.`)
+                    break;
+                case '!sudo-commands':
+                    if (config.sudoers.includes(message.author.id))
+                        message.reply(msg_avail_admin_commands);
+                    break;
+                default:
+                    distribute(message,'message',cache.apps);
+                    break;
+            }
+    } catch (error) {
+        log(`ERROR encountered, skipping message:\n` +
+            `From ${message.author.tag}: ${message.content}\n` +
+            error);
+    }
 });
 client.on('messageDelete', async function(message) {
-    distribute(message,'messageDelete',cache.apps);
+    try {
+        distribute(message,'messageDelete',cache.apps);
+    } catch (error) {
+        log(`ERROR encountered, skipping message:\n` +
+            `From ${message.author.tag}: ${message.content}\n` +
+            error);
+    }
 });
 // client.on('guildCreate', async function(guild) {
 //     //on first guild join

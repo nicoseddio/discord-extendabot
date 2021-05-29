@@ -26,7 +26,7 @@ npm install discord.js ffmpeg fluent-ffmpeg @discordjs/opus ytdl-core --save
 First, ensure an `auth.json` file with your bot's token is present in the cloned base directory. A template file is available in `{base_dir}/lib/default/`.
 Then, from within the cloned directory, run:
 ```
-node index.js
+node index.js > console.log 2>&1
 ```
 
 ## resources
