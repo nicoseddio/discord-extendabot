@@ -18,6 +18,8 @@ const client = new Discord.Client();
 const auth = require('./auth.json');
 const config = require('./config.json')
 const cache = {};
+let msg_avail_commands = '';
+let msg_avail_admin_commands = ''; //init after apps load
 
 
 
@@ -33,8 +35,10 @@ client.on('ready', () => {
     log(`Logged in as ${client.user.tag}!`,'\n');
 
     cache.apps = loadApps(config.apps,buildKernel());
+    [msg_avail_commands, msg_avail_admin_commands] = 
+        compileCommandsMessages(cache.apps);
 
-    saveConfig(config,'config.json')
+    saveConfig(config,'config.json');
 
     dumpSession(config,cache);
 });
@@ -49,11 +53,28 @@ client.on('ready', () => {
 // ---------------- Listeners ---------------- //
 // ------------------------------------------- //
 client.on('message', async function(message) {
+    //ensure message originates from bound guild
     try { if (message.guild.id != config.guild.id) return; }
     catch (error) { log("Invalid guild."); return; }
 
-    if (message.author.id === client.user.id) return; //ignore self
-    distribute(message,'message',cache.apps);
+    //ignore self
+    if (message.author.id === client.user.id) return;
+
+    //parse commands for system
+    let args = message.content.split(' ');
+
+    if (args.length > 0)
+        switch (args[0]) {
+            case 'commands':
+                message.reply(msg_avail_commands);
+                break;
+            case 'admin-commands':
+                message.reply(msg_avail_admin_commands);
+                break;
+            default:
+                distribute(message,'message',cache.apps);
+                break;
+        }
 });
 client.on('messageDelete', async function(message) {
     distribute(message,'messageDelete',cache.apps);
@@ -86,6 +107,24 @@ client.on('messageDelete', async function(message) {
 // ------------------------------------------- //
 // ---------------- Functions ---------------- //
 // ------------------------------------------- //
+function compileCommandsMessages(appCache) {
+    let commandsList = 'available commands:';
+    let adminCommandsList = 'available administrative commands:';
+    for (a in appCache) {
+        let app = appCache[a];
+        Object.keys(app.commands).forEach(ci => {
+            let cstr = 
+                `\n• **\`${app.commands[ci].usage}\`**` +
+                `\n   ${app.commands[ci].description}`  +
+                `\n       *from ${a.replace('.js','')}*`
+            if (!app.commands[ci].admin)
+                commandsList += cstr;
+            else
+                adminCommandsList += cstr;
+        })
+    }
+    return [commandsList, adminCommandsList];
+}
 function distribute(message,event,apps) {
     for (app in apps) {
         apps[app].handle(message,event);
