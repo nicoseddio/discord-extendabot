@@ -34,7 +34,11 @@ client.login(auth.token);
 client.on('ready', () => {
     log(`Logged in as ${client.user.tag}!`,'\n');
 
-    cache.apps = loadApps(config.apps,buildKernel());
+    cache.apps = loadApps(  config.apps,
+                            buildKernel(),
+                            config.apps_dir,
+                            config.appdata_dir );
+
     [msg_avail_commands, msg_avail_admin_commands] = 
         compileCommandsMessages(cache.apps);
 
@@ -149,18 +153,24 @@ function distribute(message,event,apps) {
         apps[app].handle(message,event);
     }
 }
-function loadApps(appsConfig,kernel,dir='./lib/apps/') {
-    let cfg = appsConfig;
+function loadApps(apps_cfg,kernel,apps_dir,appdata_dir) {
     const aCache = {};
+    // check appdata directory
+    if(!fs.existsSync(appdata_dir)) fs.mkdirSync(appdata_dir)
     // load in directory
-    fs.readdirSync(dir)
+    fs.readdirSync(apps_dir)
       .filter(a => a.endsWith('.js'))
       .filter(a => !a.startsWith('._'))
       .forEach(app => {
-            const appObj = require(dir+app);
-            cfg[app] = cfg[app] || {};
-            cfg[app].settings = cfg[app].settings || {};
-            aCache[app] = new appObj(kernel,cfg[app].settings);
+            const appObj = require(apps_dir+app);
+            //allocate settings in config
+            apps_cfg[app] = apps_cfg[app] || {};
+            apps_cfg[app].settings = apps_cfg[app].settings || {};
+            //allocate directory in appdata
+            let dir = appdata_dir+app+'/'
+            if(!fs.existsSync(dir)) fs.mkdirSync(dir)
+            //initialize app in cache
+            aCache[app] = new appObj(kernel,apps_cfg[app].settings,dir);
     });
     log(`Loaded ${Object.keys(aCache).length} apps.`);
     return aCache;

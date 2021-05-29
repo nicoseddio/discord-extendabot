@@ -7,6 +7,7 @@
     ],
     "apps": {
     },
-    "local_files": "./local/",
+    "apps_dir": "./lib/apps/",
+    "appdata_dir": "./appdata/",
     "mention_commands": false
 }

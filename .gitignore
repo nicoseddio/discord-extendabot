@@ -5,4 +5,4 @@
 **/dump**
 **/backup_**
 **/*.log
-local/
+appdata/
