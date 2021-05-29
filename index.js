@@ -155,6 +155,7 @@ function compileCommandsMessages(cache_apps) {
     }
     return [commandsList, adminCommandsList];
 }
+//pass message to all enabled apps
 function distribute(message,event,apps) {
     for (app in apps) {
         apps[app].handle(message,event);
@@ -251,10 +252,7 @@ function saveConfig(config,filename) {
     objectToJSON(config,filename)
     log(`Config saved to ${filename}.`)
 }
-function log(str='Marker message.',new_line='',file='./console.log') {
+function log(str='Marker message.',new_line='') {
     let logmessage = `${new_line}${createTimeStamp()} ${str}`;
     console.log(logmessage);
-    fs.appendFile(file, `\n`+logmessage, err => {
-        if (err) { console.error(err); return; }
-    })
 }
