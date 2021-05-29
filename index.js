@@ -127,22 +127,26 @@ client.on('messageDelete', async function(message) {
 // ------------------------------------------- //
 // ---------------- Functions ---------------- //
 // ------------------------------------------- //
-function compileCommandsMessages(appCache) {
-    let commandsList = 'active commands:';
-    let adminCommandsList = 'active administrative commands:';
-    //for each app's commands
-    for (a in appCache) {
-        let app = appCache[a], cs = '', cs_adm = '',
+function compileCommandsMessages(cache_apps) {
+    let commandsList = 'active commands:',
+        adminCommandsList = 'active administrative commands:';
+    //for each app's defined commands
+    for (a in cache_apps) {
+        let cs = '', cs_adm = '',
             title = `\n\n*from ${a.replace('.js','')}:*`;
         //for each command description
-        Object.keys(app.commands).forEach(ci => {
-            let cstr = `\n• **\`${app.commands[ci].command}`
-            if (typeof(app.commands[ci].usage) === 'string')
-                if(app.commands[ci].usage.length > 0)
-                    cstr+=` ${app.commands[ci].usage}`
-            cstr+=`\`**: ${app.commands[ci].description}`
+        Object.keys(cache_apps[a].commands).forEach(c => {
+            let def = cache_apps[a].commands[c];
+            //add command
+            let cstr = `\n• **\`${def.command}`
+            //add command usage if present
+            if (typeof(def.usage) === 'string')
+                if(def.usage.length > 0)
+                    cstr+=` ${def.usage}`
+            //add command description
+            cstr+=`\`**: ${def.description}`
             //add to approriate admin/user message
-            if (app.commands[ci].admin) cs_adm += cstr;
+            if (def.admin) cs_adm += cstr;
             else cs += cstr;
         })
         //if applicable, add to appropriate list
