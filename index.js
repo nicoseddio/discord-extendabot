@@ -99,24 +99,24 @@ client.on('messageDelete', async function(message) {
             error);
     }
 });
-// client.on('guildCreate', async function(guild) {
-//     //on first guild join
-//     if (config.guild === "") {
-//         //establish linked guild
-//         config.guild = guild.id;
-//         //establish primary bot owner
-//         let ownerTag = undefined;
-//         client.users.fetch(guild.ownerID)
-//                     .then(user => config.sudoers.push(user.id))
-//     }
-//     //if different guild, leave.
-//     else {
-//         guild.leave().catch(err => {
-//             console.log(`there was an error leaving the guild: \n ${err.message}`);
-//             }
-//         );
-//     }
-// })
+client.on('guildCreate', async function(guild) {
+    //on first guild join
+    if (config.guild.id === "") {
+        //establish linked guild
+        config.guild = guild.id;
+        //establish primary bot owner
+        let ownerTag = undefined;
+        client.users.fetch(guild.ownerID)
+                    .then(user => config.sudoers.push(user.id))
+    }
+    //if different guild, leave.
+    else {
+        guild.leave().catch(err => {
+            console.log(`there was an error leaving the guild: \n ${err.message}`);
+            }
+        );
+    }
+})
 
 
 
@@ -127,6 +127,76 @@ client.on('messageDelete', async function(message) {
 // ------------------------------------------- //
 // ---------------- Functions ---------------- //
 // ------------------------------------------- //
+
+//pass message to all enabled apps
+function distribute(message,event,apps) {
+    for (app in apps) {
+        apps[app].handle(message,event);
+    }
+}
+
+function isEnabled(app,channel_id,app_config) {
+    try {
+    //true if app's enabled channels is empty or contains channel
+        return (app_config[app].enabled_channels.length === 0 ||
+            app_config[app].enabled_channels.includes(channel_id))
+    } catch (error) {
+        log(`ERROR checking ${app} for channel ${channel_id}:\n`+
+            error)
+        return false;
+    }
+}
+function enableApp(app,channel_id,app_config) {
+    try {
+        if (channel_id === 'all')
+            app_config[app].enabled_channels = []
+        else
+            app_config[app].enabled_channels.push(channel_id)
+    } catch (error) {
+        log(`ERROR enabling ${app} for channel ${channel_id}:\n`+
+            error)
+    }
+}
+
+// Initialization
+function loadApps(apps_cfg,kernel,apps_dir,appdata_dir) {
+    const aCache = {};
+    // check appdata directory
+    if(!fs.existsSync(appdata_dir)) fs.mkdirSync(appdata_dir)
+    // load in directory
+    fs.readdirSync(apps_dir)
+      .filter(a => a.endsWith('.js'))
+      .filter(a => !a.startsWith('._'))
+      .forEach(app => {
+            const appObj = require(apps_dir+app);
+            //allocate settings in config
+            apps_cfg[app] = apps_cfg[app] || {};
+            apps_cfg[app].settings = apps_cfg[app].settings || {};
+            //allocate authorized channels in config
+            apps_cfg[app].enabled_channels = 
+                apps_cfg[app].enabled_channels || [];
+            //allocate directory in appdata
+            let dir = appdata_dir+app+'/'
+            if(!fs.existsSync(dir)) fs.mkdirSync(dir)
+            //initialize app in cache
+            aCache[app] = new appObj(kernel,apps_cfg[app].settings,dir);
+    });
+    log(`Loaded ${Object.keys(aCache).length} apps.`);
+    return aCache;
+}
+
+function buildKernel() {
+    class kernel {
+        getClientID() {
+            return client.user.id;
+        }
+        log(message) { //kernel call for apps
+            log(message); //function call
+        }
+    }
+    return new kernel();
+}
+
 function compileCommandsMessages(cache_apps) {
     let commandsList = 'active commands:',
         adminCommandsList = 'active administrative commands:';
@@ -154,46 +224,6 @@ function compileCommandsMessages(cache_apps) {
         if (cs_adm.length > 0) adminCommandsList += title+cs_adm;
     }
     return [commandsList, adminCommandsList];
-}
-//pass message to all enabled apps
-function distribute(message,event,apps) {
-    for (app in apps) {
-        apps[app].handle(message,event);
-    }
-}
-function loadApps(apps_cfg,kernel,apps_dir,appdata_dir) {
-    const aCache = {};
-    // check appdata directory
-    if(!fs.existsSync(appdata_dir)) fs.mkdirSync(appdata_dir)
-    // load in directory
-    fs.readdirSync(apps_dir)
-      .filter(a => a.endsWith('.js'))
-      .filter(a => !a.startsWith('._'))
-      .forEach(app => {
-            const appObj = require(apps_dir+app);
-            //allocate settings in config
-            apps_cfg[app] = apps_cfg[app] || {};
-            apps_cfg[app].settings = apps_cfg[app].settings || {};
-            //allocate directory in appdata
-            let dir = appdata_dir+app+'/'
-            if(!fs.existsSync(dir)) fs.mkdirSync(dir)
-            //initialize app in cache
-            aCache[app] = new appObj(kernel,apps_cfg[app].settings,dir);
-    });
-    log(`Loaded ${Object.keys(aCache).length} apps.`);
-    return aCache;
-}
-
-function buildKernel() {
-    class kernel {
-        getClientID() {
-            return client.user.id;
-        }
-        log(message) { //kernel call for apps
-            log(message); //function call
-        }
-    }
-    return new kernel();
 }
 
 function dumpSession(config,cache) {
